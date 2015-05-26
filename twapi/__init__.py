@@ -35,6 +35,9 @@ User = Record.create_type(
     )
 
 
+Group = Record.create_type('Group', 'id')
+
+
 _USER_DATA_SCHEMA = Schema(
     {
         'id': int,
@@ -49,6 +52,9 @@ _USER_DATA_SCHEMA = Schema(
 
 
 _DELETED_USER_ID_DATA_SCHEMA = Schema(int)
+
+
+_GROUP_DATA_SCHEMA = Schema({'id': int}, required=True, extra=False)
 
 
 _PAGINATED_RESPONSE_SCHEMA = Schema(
@@ -81,6 +87,19 @@ def get_deleted_users(connection):
     for user_data in users_data:
         user_ids = _DELETED_USER_ID_DATA_SCHEMA(user_data)
         yield user_ids
+
+
+def get_groups(connection):
+    """
+    Return information about each group that the client is allowed to know
+    about.
+
+    """
+    groups_data = _get_paginated_data(connection, '/groups/')
+    for group_data in groups_data:
+        group_data = _GROUP_DATA_SCHEMA(group_data)
+        group = Group(**group_data)
+        yield group
 
 
 def _get_paginated_data(connection, path_info, query_string_args=None):

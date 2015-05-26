@@ -7,8 +7,10 @@ from itertools import islice
 from nose.tools.trivial import eq_
 
 from twapi import BATCH_RETRIEVAL_SIZE_LIMIT
+from twapi import Group
 from twapi import User
 from twapi import get_deleted_users
+from twapi import get_groups
 from twapi import get_users
 from twapi.testing import MockConnection
 from twapi.testing import SuccessfulAPICall
@@ -158,6 +160,19 @@ class _GetDeletedUsers(_PaginatedObjectsRetriever):
     _API_CALL_PATH_INFO = '/users/deleted/'
 
 
+class _GetGroups(_PaginatedObjectsRetriever):
+    """Simulator for a successful call to :func:`~twapi.get_groups`."""
+
+    _API_CALL_PATH_INFO = '/groups/'
+
+    def _get_objects_data(self, objects):
+        groups_data = []
+        for group in objects:
+            group_data = {f: getattr(group, f) for f in Group.field_names}
+            groups_data.append(group_data)
+        return groups_data
+
+
 class TestUsersRetrieval(_ObjectsRetrievalTestCase):
 
     _DATA_RETRIEVER = staticmethod(get_users)
@@ -188,3 +203,15 @@ class TestDeletedUsersRetrieval(_ObjectsRetrievalTestCase):
     @staticmethod
     def _generate_deserialized_objects(count):
         return list(range(count))
+
+
+class TestGroupsRetrieval(_ObjectsRetrievalTestCase):
+
+    _DATA_RETRIEVER = staticmethod(get_groups)
+
+    _SIMULATOR = staticmethod(_GetGroups)
+
+    @staticmethod
+    def _generate_deserialized_objects(count):
+        groups = [Group(id=i) for i in range(count)]
+        return groups
