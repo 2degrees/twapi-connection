@@ -28,7 +28,7 @@ from requests.adapters import HTTPAdapter as RequestsHTTPAdapter
 from requests.models import Response as RequestsResponse
 
 from tests.utils import get_uuid4_str
-from twapi import Connection
+from twapi.connection import Connection
 from twapi.exc import AuthenticationError
 from twapi.exc import ClientError
 from twapi.exc import ServerError
