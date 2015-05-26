@@ -14,6 +14,8 @@
 #
 ##############################################################################
 
+from http.client import FORBIDDEN as HTTP_STATUS_FORBIDDEN
+from http.client import NOT_FOUND as HTTP_STATUS_NOT_FOUND
 from http.client import OK as HTTP_STATUS_OK
 from http.client import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
 from json import dumps as json_serialize
@@ -24,8 +26,10 @@ from requests.auth import HTTPBasicAuth
 from requests.sessions import Session
 from voluptuous import Schema
 
+from twapi.exc import AccessDeniedError
 from twapi.exc import AuthenticationError
 from twapi.exc import ClientError
+from twapi.exc import NotFoundError
 from twapi.exc import ServerError
 from twapi.exc import UnsupportedResponseError
 
@@ -171,6 +175,10 @@ class Connection(object):
 
             if response.status_code == HTTP_STATUS_UNAUTHORIZED:
                 exception_class = AuthenticationError
+            elif response.status_code == HTTP_STATUS_FORBIDDEN:
+                exception_class = AccessDeniedError
+            elif response.status_code == HTTP_STATUS_NOT_FOUND:
+                exception_class = NotFoundError
             else:
                 exception_class = ClientError
             raise exception_class()

@@ -4,12 +4,13 @@ from abc import abstractproperty
 from inspect import isgenerator
 from itertools import islice
 
-from nose.tools.trivial import eq_
+from nose.tools import eq_
 
 from twapi import BATCH_RETRIEVAL_SIZE_LIMIT
 from twapi import Group
 from twapi import User
 from twapi import get_deleted_users
+from twapi import get_group_members
 from twapi import get_groups
 from twapi import get_users
 from twapi.testing import MockConnection
@@ -33,10 +34,17 @@ class _ObjectsRetrievalTestCase(object, metaclass=ABCMeta):
 
     def _test_retrieved_objects(self, count):
         objects = self._generate_deserialized_objects(count)
-        simulator = self._SIMULATOR(objects)
+        simulator = self._make_simulator(objects)
         with MockConnection(simulator) as connection:
-            retrieved_objects = list(self._DATA_RETRIEVER(connection))
+            data = self._retrieve_data(connection)
+            retrieved_objects = list(data)
         eq_(objects, retrieved_objects)
+
+    def _retrieve_data(self, connection):
+        return self._DATA_RETRIEVER(connection)
+
+    def _make_simulator(self, objects):
+        return self._SIMULATOR(objects)
 
     @abstractmethod
     def _generate_deserialized_objects(self, count):
@@ -173,6 +181,19 @@ class _GetGroups(_PaginatedObjectsRetriever):
         return groups_data
 
 
+class _GetGroupMembers(_PaginatedObjectsRetriever):
+    """Simulator for a successful call to :func:`~twapi.get_group_members`."""
+
+    def __init__(self, objects, group_id):
+        super(_GetGroupMembers, self).__init__(objects)
+
+        self._group_id = group_id
+
+    @property
+    def _API_CALL_PATH_INFO(self):
+        return '/groups/{}/members/'.format(self._group_id)
+
+
 class TestUsersRetrieval(_ObjectsRetrievalTestCase):
 
     _DATA_RETRIEVER = staticmethod(get_users)
@@ -215,3 +236,22 @@ class TestGroupsRetrieval(_ObjectsRetrievalTestCase):
     def _generate_deserialized_objects(count):
         groups = [Group(id=i) for i in range(count)]
         return groups
+
+
+class TestGroupMembersRetrieval(_ObjectsRetrievalTestCase):
+
+    _DATA_RETRIEVER = staticmethod(get_group_members)
+
+    _SIMULATOR = staticmethod(_GetGroupMembers)
+
+    _GROUP_ID = 1
+
+    def _retrieve_data(self, connection):
+        return self._DATA_RETRIEVER(connection, self._GROUP_ID)
+
+    def _make_simulator(self, objects):
+        return self._SIMULATOR(objects, self._GROUP_ID)
+
+    @staticmethod
+    def _generate_deserialized_objects(count):
+        return list(range(count))

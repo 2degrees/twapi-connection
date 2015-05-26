@@ -14,8 +14,6 @@
 #
 ##############################################################################
 
-from copy import deepcopy
-
 from pyrecord import Record
 
 
@@ -40,18 +38,14 @@ UnsuccessfulAPICall = APICall.extend_type('UnsuccessfulAPICall', 'exception')
 
 
 class MockConnection(object):
-    """
-    Mock representation of a
-    :class:`~twapi.Connection`
+    """Mock representation of a :class:`~twapi.Connection`"""
 
-    """
     def __init__(self, *api_calls_simulators):
         super(MockConnection, self).__init__()
 
         self._expected_api_calls = []
         for api_calls_simulator in api_calls_simulators:
             for api_call in api_calls_simulator():
-                api_call = _normalize_api_call(api_call)
                 self._expected_api_calls.append(api_call)
 
         self._request_count = 0
@@ -128,16 +122,6 @@ class MockConnection(object):
         assert are_enough_api_calls, error_message
 
 
-def _normalize_api_call(api_call):
-    if isinstance(api_call, SuccessfulAPICall):
-        api_call = deepcopy(api_call)
-        api_call.response_body_deserialization = \
-            _convert_object_strings_to_unicode(
-                api_call.response_body_deserialization,
-                )
-    return api_call
-
-
 def _assert_request_matches_api_call(
     api_call,
     url_path,
@@ -170,18 +154,3 @@ def _assert_request_matches_api_call(
             api_call.request_body_deserialization,
             request_body_deserialization,
             )
-
-
-def _convert_object_strings_to_unicode(object_):
-    if isinstance(object_, (list, tuple)):
-        object_converted = \
-            [_convert_object_strings_to_unicode(value) for value in object_]
-    elif isinstance(object_, dict):
-        object_converted = {}
-        for key, value in object_.items():
-            object_converted[_convert_object_strings_to_unicode(key)] = \
-                _convert_object_strings_to_unicode(value)
-    else:
-        object_converted = object_
-
-    return object_converted

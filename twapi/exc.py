@@ -31,6 +31,14 @@ class AuthenticationError(ClientError):
     pass
 
 
+class AccessDeniedError(ClientError):
+    pass
+
+
+class NotFoundError(ClientError):
+    pass
+
+
 class ServerError(TwodAPIException):
     """
     Remote failed to process the request due to a problem at their end. This

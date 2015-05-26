@@ -29,8 +29,10 @@ from requests.models import Response as RequestsResponse
 
 from tests.utils import get_uuid4_str
 from twapi.connection import Connection
+from twapi.exc import AccessDeniedError
 from twapi.exc import AuthenticationError
 from twapi.exc import ClientError
+from twapi.exc import NotFoundError
 from twapi.exc import ServerError
 from twapi.exc import UnsupportedResponseError
 
@@ -198,10 +200,24 @@ class TestErrorResponses(object):
         eq_('500 Reason', str(exception))
 
     def test_client_error_response(self):
-        response_data_maker = _ResponseMaker(404, {})
+        response_data_maker = _ResponseMaker(400, {})
         connection = _MockConnection(response_data_maker)
 
         with assert_raises(ClientError) as context_manager:
+            connection.send_get_request(_STUB_URL_PATH)
+
+    def test_resource_not_found_response(self):
+        response_data_maker = _ResponseMaker(404, {})
+        connection = _MockConnection(response_data_maker)
+
+        with assert_raises(NotFoundError) as context_manager:
+            connection.send_get_request(_STUB_URL_PATH)
+
+    def test_forbidden_response(self):
+        response_data_maker = _ResponseMaker(403, {})
+        connection = _MockConnection(response_data_maker)
+
+        with assert_raises(AccessDeniedError) as context_manager:
             connection.send_get_request(_STUB_URL_PATH)
 
 
