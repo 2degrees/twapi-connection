@@ -6,15 +6,15 @@ from itertools import islice
 
 from nose.tools import eq_
 
-from twapi import BATCH_RETRIEVAL_SIZE_LIMIT
-from twapi import Group
-from twapi import User
-from twapi import get_deleted_users
-from twapi import get_group_members
-from twapi import get_groups
-from twapi import get_users
 from twapi.testing import MockConnection
 from twapi.testing import SuccessfulAPICall
+from twapi.users import BATCH_RETRIEVAL_SIZE_LIMIT
+from twapi.users import Group
+from twapi.users import User
+from twapi.users import get_deleted_users
+from twapi.users import get_group_members
+from twapi.users import get_groups
+from twapi.users import get_users
 
 
 class _ObjectsRetrievalTestCase(object, metaclass=ABCMeta):
