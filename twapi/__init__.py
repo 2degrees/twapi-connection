@@ -13,3 +13,89 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+
+from urllib.parse import parse_qsl
+from urllib.parse import urlsplit
+
+from pyrecord import Record
+from voluptuous import Any
+from voluptuous import Schema
+
+
+BATCH_RETRIEVAL_SIZE_LIMIT = 200
+
+
+User = Record.create_type(
+    'User',
+    'id',
+    'full_name',
+    'email_address',
+    'organization_name',
+    'job_title',
+    )
+
+
+_USER_DATA_SCHEMA = Schema(
+    {
+        'id': int,
+        'full_name': str,
+        'email_address': str,
+        'organization_name': str,
+        'job_title': str
+        },
+    required=True,
+    extra=False,
+    )
+
+
+_PAGINATED_RESPONSE_SCHEMA = Schema(
+    {
+        'count': int,
+        'next': Any(str, None),
+        'future_updates': str,
+        'results': [],
+        },
+    required=True,
+    extra=True,
+    )
+
+
+def get_users(connection):
+    """
+    Return information about each user that the client is allowed to know
+    about.
+
+    """
+    users_data = _get_paginated_data(connection, '/users/')
+    for user_data in users_data:
+        user_data = _USER_DATA_SCHEMA(user_data)
+        user = User(**user_data)
+        yield user
+
+
+def _get_paginated_data(connection, path_info, query_string_args=None):
+    data_by_page = _get_data_by_page(path_info, query_string_args, connection)
+    for page_data in data_by_page:
+        for datum in page_data:
+            yield datum
+
+
+def _get_data_by_page(path_info, query_string_args, connection):
+    has_more_pages = True
+    while has_more_pages:
+        response = connection.send_get_request(path_info, query_string_args)
+        response = _PAGINATED_RESPONSE_SCHEMA(response)
+
+        response_data = response['results']
+        yield response_data
+
+        next_page_url = response['next']
+        query_string_args = _parse_url_query(next_page_url)
+        has_more_pages = bool(next_page_url)
+
+
+def _parse_url_query(url):
+    url_parts = urlsplit(url)
+    url_query_raw = url_parts.query
+    url_query = dict(parse_qsl(url_query_raw))
+    return url_query
