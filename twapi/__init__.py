@@ -48,11 +48,13 @@ _USER_DATA_SCHEMA = Schema(
     )
 
 
+_DELETED_USER_ID_DATA_SCHEMA = Schema(int)
+
+
 _PAGINATED_RESPONSE_SCHEMA = Schema(
     {
         'count': int,
         'next': Any(str, None),
-        'future_updates': str,
         'results': [],
         },
     required=True,
@@ -71,6 +73,14 @@ def get_users(connection):
         user_data = _USER_DATA_SCHEMA(user_data)
         user = User(**user_data)
         yield user
+
+
+def get_deleted_users(connection):
+    """Return the identifiers of the users that have been deleted."""
+    users_data = _get_paginated_data(connection, '/users/deleted/')
+    for user_data in users_data:
+        user_ids = _DELETED_USER_ID_DATA_SCHEMA(user_data)
+        yield user_ids
 
 
 def _get_paginated_data(connection, path_info, query_string_args=None):

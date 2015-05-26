@@ -8,54 +8,40 @@ from nose.tools.trivial import eq_
 
 from twapi import BATCH_RETRIEVAL_SIZE_LIMIT
 from twapi import User
+from twapi import get_deleted_users
 from twapi import get_users
 from twapi.testing import MockConnection
 from twapi.testing import SuccessfulAPICall
 
 
-class TestUsersRetrieval(object):
+class _ObjectsRetrievalTestCase(object, metaclass=ABCMeta):
 
-    def test_no_users(self):
-        simulator = GetUsers([])
-        connection = MockConnection(simulator)
-        with connection:
-            users = list(get_users(connection))
-        eq_([], users)
+    _DATA_RETRIEVER = abstractproperty()
+
+    _SIMULATOR = abstractproperty()
+
+    def test_no_data(self):
+        self._test_retrieved_objects(0)
 
     def test_not_exceeding_pagination_size(self):
-        users = self._make_users(BATCH_RETRIEVAL_SIZE_LIMIT - 1)
-        simulator = GetUsers(users)
-        connection = MockConnection(simulator)
-        with connection:
-            retrieved_users = list(get_users(connection))
-        eq_(users, retrieved_users)
+        self._test_retrieved_objects(BATCH_RETRIEVAL_SIZE_LIMIT - 1)
 
     def test_exceeding_pagination_size(self):
-        users = self._make_users(BATCH_RETRIEVAL_SIZE_LIMIT + 1)
-        simulator = GetUsers(users)
-        connection = MockConnection(simulator)
-        with connection:
-            retrieved_users = list(get_users(connection))
-        eq_(users, retrieved_users)
+        self._test_retrieved_objects(BATCH_RETRIEVAL_SIZE_LIMIT + 1)
 
-    @staticmethod
-    def _make_users(user_count):
-        users = []
-        for counter in range(user_count):
-            user = User(
-                id=counter,
-                full_name='User {}'.format(counter),
-                email_address='user-{}@example.com'.format(counter),
-                organization_name='Example Ltd',
-                job_title='Employee {}'.format(counter),
-                )
-            users.append(user)
-        return users
+    def _test_retrieved_objects(self, count):
+        objects = self._generate_deserialized_objects(count)
+        simulator = self._SIMULATOR(objects)
+        with MockConnection(simulator) as connection:
+            retrieved_objects = list(self._DATA_RETRIEVER(connection))
+        eq_(objects, retrieved_objects)
+
+    @abstractmethod
+    def _generate_deserialized_objects(self, count):
+        pass
 
 
-class _PaginatedObjectsRetriever(object):
-
-    __metaclass__ = ABCMeta
+class _PaginatedObjectsRetriever(object, metaclass=ABCMeta):
 
     _API_CALL_PATH_INFO = abstractproperty()
 
@@ -128,9 +114,8 @@ class _PaginatedObjectsRetriever(object):
             page_number = 1
         return page_number
 
-    @abstractmethod
     def _get_objects_data(self, objects):
-        pass  # pragma: no cover
+        return objects
 
 
 def _paginate(iterable, page_size):
@@ -154,23 +139,52 @@ def _get_next_page_iterable_as_list(iterable, page_size):
     return next_page_iterable
 
 
-class GetUsers(_PaginatedObjectsRetriever):
+class _GetUsers(_PaginatedObjectsRetriever):
     """Simulator for a successful call to :func:`~twapi.get_users`."""
 
     _API_CALL_PATH_INFO = '/users/'
 
-    def _get_response_body_deserialization(self, page_objects):
-        response_body_deserialization = super(GetUsers, self) \
-            ._get_response_body_deserialization(page_objects)
-
-        future_updates_url = ''
-        response_body_deserialization['future_updates'] = future_updates_url
-        return response_body_deserialization
-
-    @abstractmethod
     def _get_objects_data(self, objects):
         users_data = []
         for user in objects:
             user_data = {f: getattr(user, f) for f in User.field_names}
             users_data.append(user_data)
         return users_data
+
+
+class _GetDeletedUsers(_PaginatedObjectsRetriever):
+    """Simulator for a successful call to :func:`~twapi.get_deleted_users`."""
+
+    _API_CALL_PATH_INFO = '/users/deleted/'
+
+
+class TestUsersRetrieval(_ObjectsRetrievalTestCase):
+
+    _DATA_RETRIEVER = staticmethod(get_users)
+
+    _SIMULATOR = staticmethod(_GetUsers)
+
+    @staticmethod
+    def _generate_deserialized_objects(count):
+        users = []
+        for counter in range(count):
+            user = User(
+                id=counter,
+                full_name='User {}'.format(counter),
+                email_address='user-{}@example.com'.format(counter),
+                organization_name='Example Ltd',
+                job_title='Employee {}'.format(counter),
+                )
+            users.append(user)
+        return users
+
+
+class TestDeletedUsersRetrieval(_ObjectsRetrievalTestCase):
+
+    _DATA_RETRIEVER = staticmethod(get_deleted_users)
+
+    _SIMULATOR = staticmethod(_GetDeletedUsers)
+
+    @staticmethod
+    def _generate_deserialized_objects(count):
+        return list(range(count))
