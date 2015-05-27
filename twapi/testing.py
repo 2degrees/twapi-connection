@@ -66,7 +66,10 @@ class MockConnection(object):
     def send_get_request(self, url_path, query_string_args=None):
         return self._call_remote_method(url_path, 'GET', query_string_args)
 
-    def send_post_request(self, url_path, body_deserialization):
+    def send_head_request(self, url_path, query_string_args=None):
+        return self._call_remote_method(url_path, 'HEAD', query_string_args)
+
+    def send_post_request(self, url_path, body_deserialization=None):
         return self._call_remote_method(
             url_path,
             'POST',

@@ -18,6 +18,7 @@ from itertools import chain
 
 from nose.tools import assert_false
 from nose.tools import assert_is_instance
+from nose.tools import assert_is_none
 from nose.tools import assert_raises
 from nose.tools import eq_
 
@@ -46,7 +47,7 @@ _STUB_API_CALL_2 = SuccessfulAPICall(
     )
 
 
-class TestMockPortalConnection(object):
+class TestMockConnection(object):
 
     def test_get_request(self):
         connection = \
@@ -73,7 +74,52 @@ class TestMockPortalConnection(object):
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
 
+    def test_head_request(self):
+        expected_api_call = SuccessfulAPICall(
+            _STUB_URL_PATH,
+            'HEAD',
+            response_body_deserialization=None,
+            )
+        connection = \
+            self._make_connection_for_expected_api_call(expected_api_call)
+
+        response_body_deserialization = \
+            connection.send_head_request(_STUB_URL_PATH)
+
+        self._assert_sole_api_call_equals(expected_api_call, connection)
+        assert_is_none(response_body_deserialization)
+
+    def test_head_request_with_query_string_args(self):
+        query_string_args = {'foo': 'bar'}
+        expected_api_call = SuccessfulAPICall(
+            _STUB_URL_PATH,
+            'HEAD',
+            query_string_args,
+            response_body_deserialization=None,
+            )
+        connection = \
+            self._make_connection_for_expected_api_call(expected_api_call)
+
+        connection.send_head_request(_STUB_URL_PATH, query_string_args)
+
+        self._assert_sole_api_call_equals(expected_api_call, connection)
+
     def test_post_request(self):
+        expected_api_call = SuccessfulAPICall(
+            _STUB_URL_PATH,
+            'POST',
+            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            )
+        connection = \
+            self._make_connection_for_expected_api_call(expected_api_call)
+
+        response_body_deserialization = \
+            connection.send_post_request(_STUB_URL_PATH)
+
+        self._assert_sole_api_call_equals(expected_api_call, connection)
+        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+
+    def test_post_request_with_body(self):
         request_body_deserialization = {'foo': 'bar'}
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,

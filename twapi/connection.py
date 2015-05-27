@@ -77,7 +77,17 @@ class Connection(object):
         """
         return self._send_request('GET', url_path, query_string_args)
 
-    def send_post_request(self, url_path, body_deserialization):
+    def send_head_request(self, url_path, query_string_args=None):
+        """
+        Send a HEAD request
+
+        :param str url_path: The URL path to the endpoint
+        :param dict query_string_args: The query string arguments
+
+        """
+        self._send_request('HEAD', url_path, query_string_args)
+
+    def send_post_request(self, url_path, body_deserialization=None):
         """
         Send a POST request
 

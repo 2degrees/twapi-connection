@@ -50,8 +50,14 @@ class TestConnection(object):
     def test_get_request(self):
         self._check_request_sender('GET', 'send_get_request', False)
 
+    def test_head_request(self):
+        self._check_request_sender('HEAD', 'send_head_request', False)
+
     def test_post_request(self):
         self._check_request_sender('POST', 'send_post_request', True)
+
+    def test_post_request_with_no_body(self):
+        self._check_request_sender('POST', 'send_post_request', False)
 
     def test_put_request(self):
         self._check_request_sender('PUT', 'send_put_request', True)
