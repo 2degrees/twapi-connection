@@ -46,6 +46,7 @@ setup(
     url='https://github.com/2degrees/twapi-connection/',
     license='BSD (http://dev.2degreesnetwork.com/p/2degrees-license.html)',
     packages=find_packages(exclude=['tests']),
+    namespace_packages=['twapi'],
     install_requires=[
         'requests >= 2.7',
         'pyrecord >= 1.0a1',
