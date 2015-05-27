@@ -23,13 +23,13 @@ Indices and tables
 Support
 -------
 
-For questions directly related to *twod-api-client*, please use our
+For questions directly related to *twapi-connection*, please use our
 `2degrees-floss mailing list <http://groups.google.com/group/2degrees-floss/>`_.
 
 Please go to `our development site at GitHub
-<https://github.com/2degrees/twod-api-client/>`_ to get the
+<https://github.com/2degrees/twapi-connection/>`_ to get the
 latest code, create pull requests and raise `issues
-<https://github.com/2degrees/twod-api-client/issues/>`_.
+<https://github.com/2degrees/twapi-connection/issues/>`_.
 
 
 

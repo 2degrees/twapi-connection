@@ -3,8 +3,8 @@
 # Copyright (c) 2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod-api-client
-# <https://github.com/2degrees/twod-api-client>, which is subject to the
+# This file is part of twapi-connection
+# <https://github.com/2degrees/twapi-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -24,10 +24,10 @@ from nose.tools import eq_
 
 from tests.utils import assert_raises_substring
 from tests.utils import get_uuid4_str
-from twapi.exc import AuthenticationError
-from twapi.testing import MockConnection
-from twapi.testing import SuccessfulAPICall
-from twapi.testing import UnsuccessfulAPICall
+from twapi.connection.exc import AuthenticationError
+from twapi.connection.testing import MockConnection
+from twapi.connection.testing import SuccessfulAPICall
+from twapi.connection.testing import UnsuccessfulAPICall
 
 
 _STUB_URL_PATH = '/foo'

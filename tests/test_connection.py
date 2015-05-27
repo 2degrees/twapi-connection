@@ -3,8 +3,8 @@
 # Copyright (c) 2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod-api-client
-# <https://github.com/2degrees/twod-api-client>, which is subject to the
+# This file is part of twapi-connection
+# <https://github.com/2degrees/twapi-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -29,12 +29,12 @@ from requests.models import Response as RequestsResponse
 
 from tests.utils import get_uuid4_str
 from twapi.connection import Connection
-from twapi.exc import AccessDeniedError
-from twapi.exc import AuthenticationError
-from twapi.exc import ClientError
-from twapi.exc import NotFoundError
-from twapi.exc import ServerError
-from twapi.exc import UnsupportedResponseError
+from twapi.connection.exc import AccessDeniedError
+from twapi.connection.exc import AuthenticationError
+from twapi.connection.exc import ClientError
+from twapi.connection.exc import NotFoundError
+from twapi.connection.exc import ServerError
+from twapi.connection.exc import UnsupportedResponseError
 
 
 _STUB_URL_PATH = '/foo'

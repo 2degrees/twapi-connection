@@ -3,8 +3,8 @@
 # Copyright (c) 2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod-api-client
-# <https://github.com/2degrees/twod-api-client>, which is subject to the
+# This file is part of twapi-connection
+# <https://github.com/2degrees/twapi-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -28,7 +28,7 @@ _VERSION = \
 _LONG_DESCRIPTION = _README_CONTENTS
 
 setup(
-    name='twod-api-client',
+    name='twapi-connection',
     version=_VERSION,
     description='Lightweight abstraction layer for making requests to the '
         '2degrees platform API',
@@ -43,7 +43,7 @@ setup(
     keywords='2degrees',
     author='2degrees Limited',
     author_email='2degrees-floss@googlegroups.com',
-    url='https://github.com/2degrees/twod-api-client/',
+    url='https://github.com/2degrees/twapi-connection/',
     license='BSD (http://dev.2degreesnetwork.com/p/2degrees-license.html)',
     packages=find_packages(exclude=['tests']),
     install_requires=[
