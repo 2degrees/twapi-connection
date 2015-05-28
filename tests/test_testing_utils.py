@@ -24,10 +24,10 @@ from nose.tools import eq_
 
 from tests.utils import assert_raises_substring
 from tests.utils import get_uuid4_str
-from twapi.connection.exc import AuthenticationError
-from twapi.connection.testing import MockConnection
-from twapi.connection.testing import SuccessfulAPICall
-from twapi.connection.testing import UnsuccessfulAPICall
+from twapi_connection.exc import AuthenticationError
+from twapi_connection.testing import MockConnection
+from twapi_connection.testing import SuccessfulAPICall
+from twapi_connection.testing import UnsuccessfulAPICall
 
 
 _STUB_URL_PATH = '/foo'

@@ -28,13 +28,13 @@ from requests.adapters import HTTPAdapter as RequestsHTTPAdapter
 from requests.models import Response as RequestsResponse
 
 from tests.utils import get_uuid4_str
-from twapi.connection import Connection
-from twapi.connection.exc import AccessDeniedError
-from twapi.connection.exc import AuthenticationError
-from twapi.connection.exc import ClientError
-from twapi.connection.exc import NotFoundError
-from twapi.connection.exc import ServerError
-from twapi.connection.exc import UnsupportedResponseError
+from twapi_connection import Connection
+from twapi_connection.exc import AccessDeniedError
+from twapi_connection.exc import AuthenticationError
+from twapi_connection.exc import ClientError
+from twapi_connection.exc import NotFoundError
+from twapi_connection.exc import ServerError
+from twapi_connection.exc import UnsupportedResponseError
 
 
 _STUB_URL_PATH = '/foo'

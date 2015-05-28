@@ -26,12 +26,12 @@ from requests.auth import HTTPBasicAuth
 from requests.sessions import Session
 from voluptuous import Schema
 
-from twapi.connection.exc import AccessDeniedError
-from twapi.connection.exc import AuthenticationError
-from twapi.connection.exc import ClientError
-from twapi.connection.exc import NotFoundError
-from twapi.connection.exc import ServerError
-from twapi.connection.exc import UnsupportedResponseError
+from twapi_connection.exc import AccessDeniedError
+from twapi_connection.exc import AuthenticationError
+from twapi_connection.exc import ClientError
+from twapi_connection.exc import NotFoundError
+from twapi_connection.exc import ServerError
+from twapi_connection.exc import UnsupportedResponseError
 
 
 _DISTRIBUTION_NAME = 'twapi-connection'
