@@ -49,7 +49,6 @@ setup(
     install_requires=[
         'requests >= 2.7',
         'pyrecord >= 1.0a1',
-        'voluptuous >= 0.8.7',
         ],
     test_suite='nose.collector',
     )

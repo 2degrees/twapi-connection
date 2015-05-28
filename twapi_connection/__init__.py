@@ -24,7 +24,6 @@ from pkg_resources import get_distribution
 from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
 from requests.sessions import Session
-from voluptuous import Schema
 
 from twapi_connection.exc import AccessDeniedError
 from twapi_connection.exc import AuthenticationError
@@ -37,13 +36,6 @@ from twapi_connection.exc import UnsupportedResponseError
 _DISTRIBUTION_NAME = 'twapi-connection'
 _DISTRIBUTION_VERSION = get_distribution(_DISTRIBUTION_NAME).version
 _USER_AGENT = '2degrees Python Client/' + _DISTRIBUTION_VERSION
-
-
-_ERROR_RESPONSE_SCHEMA = Schema(
-    {},
-    required=True,
-    extra=True,
-    )
 
 
 _HTTP_CONNECTION_MAX_RETRIES = 3
@@ -168,8 +160,11 @@ class Connection(object):
         cls._require_successful_response(response)
 
         if response.status_code == HTTP_STATUS_OK:
-            cls._require_json_response(response)
-            response_body_deserialization = response.json() or None
+            if response.content:
+                cls._require_json_response(response)
+                response_body_deserialization = response.json()
+            else:
+                response_body_deserialization = None
         else:
             exception_message = \
                 'Unsupported response status {}'.format(response.status_code)
@@ -180,9 +175,6 @@ class Connection(object):
     @staticmethod
     def _require_successful_response(response):
         if 400 <= response.status_code < 500:
-            response_data = response.json()
-            error_data = _ERROR_RESPONSE_SCHEMA(response_data)
-
             if response.status_code == HTTP_STATUS_UNAUTHORIZED:
                 exception_class = AuthenticationError
             elif response.status_code == HTTP_STATUS_FORBIDDEN:

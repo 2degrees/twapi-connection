@@ -173,10 +173,10 @@ class TestConnection(object):
         eq_('Response does not specify a Content-Type', str(exception))
 
     def test_response_content_length_is_zero(self):
-        response_data_maker = _ResponseMaker(200, '', 'application/json')
+        response_data_maker = _ResponseMaker(200, None, 'application/json')
         connection = _MockConnection(response_data_maker)
 
-        response_data = connection.send_get_request(_STUB_URL_PATH)
+        response_data = connection.send_head_request(_STUB_URL_PATH)
 
         eq_(None, response_data)
 
@@ -323,8 +323,11 @@ class _ResponseMaker(object):
                 '{}; charset=UTF-8'.format(self._content_type)
             response.headers['Content-Type'] = content_type_header_value
 
-        if self._status_code != 204 and self._body_deserialization is not None:
-            response._content = json_serialize(self._body_deserialization).encode('utf-8')
+        if self._body_deserialization is None:
+            response._content = ''
+        else:
+            response._content = \
+                json_serialize(self._body_deserialization).encode('utf-8')
 
         return response
 
