@@ -1,7 +1,7 @@
 .. include:: ../../README.rst
 
 
-Welcome to Twod API client's documentation!
+Welcome to 2degrees API client's documentation!
 -------------------------------------------
 
 Contents:
