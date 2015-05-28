@@ -270,7 +270,7 @@ class TestMockConnection(object):
             self._make_connection_for_expected_api_call(_STUB_API_CALL_1)
 
         url_path = _STUB_URL_PATH + '/foo'
-        error_message = 'Expected URL path {!r}, got {!r}'.format(
+        error_message = 'Expected URL {!r}, got {!r}'.format(
             _STUB_URL_PATH,
             url_path,
             )

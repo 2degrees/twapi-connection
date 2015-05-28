@@ -102,6 +102,15 @@ class TestConnection(object):
         else:
             assert_false(prepared_request.body)
 
+    def test_absolute_url(self):
+        connection = _MockConnection()
+
+        api_absolute_url = Connection._API_URL + _STUB_URL_PATH
+        connection.send_get_request(api_absolute_url)
+
+        prepared_request = connection.prepared_requests[0]
+        eq_(api_absolute_url, prepared_request.url)
+
     def test_user_agent(self):
         connection = _MockConnection()
 

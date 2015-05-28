@@ -56,34 +56,34 @@ class Connection(object):
         http_adapter = HTTPAdapter(max_retries=_HTTP_CONNECTION_MAX_RETRIES)
         self._session.mount('', http_adapter)
 
-    def send_get_request(self, url_path, query_string_args=None):
+    def send_get_request(self, url, query_string_args=None):
         """
         Send a GET request
 
-        :param str url_path: The URL path to the endpoint
+        :param str url: The URL or URL path to the endpoint
         :param dict query_string_args: The query string arguments
 
         :return: Decoded version of the ``JSON`` the remote put in \
                 the body of the response.
 
         """
-        return self._send_request('GET', url_path, query_string_args)
+        return self._send_request('GET', url, query_string_args)
 
-    def send_head_request(self, url_path, query_string_args=None):
+    def send_head_request(self, url, query_string_args=None):
         """
         Send a HEAD request
 
-        :param str url_path: The URL path to the endpoint
+        :param str url: The URL or URL path to the endpoint
         :param dict query_string_args: The query string arguments
 
         """
-        self._send_request('HEAD', url_path, query_string_args)
+        self._send_request('HEAD', url, query_string_args)
 
-    def send_post_request(self, url_path, body_deserialization=None):
+    def send_post_request(self, url, body_deserialization=None):
         """
         Send a POST request
 
-        :param str url_path: The URL path to the endpoint
+        :param str url: The URL or URL path to the endpoint
         :param dict body_deserialization: The request's body message \
             deserialized
 
@@ -92,15 +92,15 @@ class Connection(object):
         """
         return self._send_request(
             'POST',
-            url_path,
+            url,
             body_deserialization=body_deserialization,
             )
 
-    def send_put_request(self, url_path, body_deserialization):
+    def send_put_request(self, url, body_deserialization):
         """
         Send a PUT request
 
-        :param str url_path: The URL path to the endpoint
+        :param str url: The URL or URL path to the endpoint
         :param body_deserialization: The request's body message deserialized
 
         :return: Decoded version of the ``JSON`` the remote put in \
@@ -108,29 +108,32 @@ class Connection(object):
         """
         return self._send_request(
             'PUT',
-            url_path,
+            url,
             body_deserialization=body_deserialization,
             )
 
-    def send_delete_request(self, url_path):
+    def send_delete_request(self, url):
         """
         Send a DELETE request
 
-        :param str url_path: The URL path to the endpoint
+        :param str url: The URL or URL path to the endpoint
 
         :return: Decoded version of the ``JSON`` the remote put in \
                 the body of the response.
         """
-        return self._send_request('DELETE', url_path)
+        return self._send_request('DELETE', url)
 
     def _send_request(
         self,
         method,
-        url_path,
+        url,
         query_string_args=None,
         body_deserialization=None,
         ):
-        url = self._API_URL + url_path
+        if url.startswith(self._API_URL):
+            url = url
+        else:
+            url = self._API_URL + url
 
         query_string_args = query_string_args or {}
 

@@ -19,7 +19,7 @@ from pyrecord import Record
 
 APICall = Record.create_type(
     'APICall',
-    'url_path',
+    'url',
     'http_method',
     'query_string_args',
     'request_body_deserialization',
@@ -63,43 +63,43 @@ class MockConnection(object):
             '{} more requests were expected'.format(pending_api_call_count)
         assert expected_api_call_count == self._request_count, error_message
 
-    def send_get_request(self, url_path, query_string_args=None):
-        return self._call_remote_method(url_path, 'GET', query_string_args)
+    def send_get_request(self, url, query_string_args=None):
+        return self._call_remote_method(url, 'GET', query_string_args)
 
-    def send_head_request(self, url_path, query_string_args=None):
-        return self._call_remote_method(url_path, 'HEAD', query_string_args)
+    def send_head_request(self, url, query_string_args=None):
+        return self._call_remote_method(url, 'HEAD', query_string_args)
 
-    def send_post_request(self, url_path, body_deserialization=None):
+    def send_post_request(self, url, body_deserialization=None):
         return self._call_remote_method(
-            url_path,
+            url,
             'POST',
             request_body_deserialization=body_deserialization,
             )
 
-    def send_put_request(self, url_path, body_deserialization):
+    def send_put_request(self, url, body_deserialization):
         return self._call_remote_method(
-            url_path,
+            url,
             'PUT',
             request_body_deserialization=body_deserialization,
             )
 
-    def send_delete_request(self, url_path):
-        return self._call_remote_method(url_path, 'DELETE')
+    def send_delete_request(self, url):
+        return self._call_remote_method(url, 'DELETE')
 
     def _call_remote_method(
         self,
-        url_path,
+        url,
         http_method,
         query_string_args=None,
         request_body_deserialization=None,
         ):
-        self._require_enough_api_calls(url_path)
+        self._require_enough_api_calls(url)
 
         expected_api_call = self._expected_api_calls[self._request_count]
 
         _assert_request_matches_api_call(
             expected_api_call,
-            url_path,
+            url,
             http_method,
             query_string_args,
             request_body_deserialization,
@@ -117,24 +117,23 @@ class MockConnection(object):
         api_calls = self._expected_api_calls[:self._request_count]
         return api_calls
 
-    def _require_enough_api_calls(self, url_path):
+    def _require_enough_api_calls(self, url):
         are_enough_api_calls = \
             self._request_count < len(self._expected_api_calls)
         error_message = 'Not enough API calls for new requests ' \
-            '(requested {!r})'.format(url_path)
+            '(requested {!r})'.format(url)
         assert are_enough_api_calls, error_message
 
 
 def _assert_request_matches_api_call(
     api_call,
-    url_path,
+    url,
     http_method,
     query_string_args,
     request_body_deserialization,
     ):
-    url_paths_match = api_call.url_path == url_path
-    assert url_paths_match, \
-        'Expected URL path {!r}, got {!r}'.format(api_call.url_path, url_path)
+    urls_match = api_call.url == url
+    assert urls_match, 'Expected URL {!r}, got {!r}'.format(api_call.url, url)
 
     query_string_args_match = api_call.query_string_args == query_string_args
     assert query_string_args_match, \
