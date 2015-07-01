@@ -45,7 +45,7 @@ class Connection(object):
 
     _API_URL = 'https://www.2degreesnetwork.com/api'
 
-    def __init__(self, email_address, password, api_url=None):
+    def __init__(self, email_address, password, timeout=None, api_url=None):
         super(Connection, self).__init__()
 
         self._api_url = api_url or self._API_URL
@@ -54,6 +54,8 @@ class Connection(object):
 
         self._session = Session()
         self._session.headers['User-Agent'] = _USER_AGENT
+
+        self._timeout = timeout
 
         http_adapter = HTTPAdapter(max_retries=_HTTP_CONNECTION_MAX_RETRIES)
         self._session.mount('', http_adapter)
@@ -154,6 +156,7 @@ class Connection(object):
             auth=self._authentication_handler,
             data=request_body_serialization,
             headers=request_headers,
+            timeout=self._timeout,
             )
 
         response_body_deserialization = \

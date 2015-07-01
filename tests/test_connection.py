@@ -131,6 +131,11 @@ class TestConnection(object):
         user_agent_header_value = prepared_request.headers['User-Agent']
         ok_(user_agent_header_value.startswith('2degrees Python Client/'))
 
+    def test_request_timeout(self):
+        connection = _MockConnection(timeout=1)
+        connection.send_get_request(_STUB_URL_PATH)
+        eq_(1, connection.adapter.timeout)
+
     def test_json_response(self):
         """
         The output of "200 OK" responses with a JSON body is that body
@@ -305,10 +310,13 @@ class _MockRequestsAdapter(RequestsHTTPAdapter):
         self.prepared_requests = []
         self.is_keep_alive_always_used = True
         self.is_open = True
+        self.timeout = None
 
-    def send(self, request, stream=False, *args, **kwargs):
+    def send(self, request, stream=False, timeout=None, *args, **kwargs):
         is_keep_alive_implied = not stream
         self.is_keep_alive_always_used &= is_keep_alive_implied
+
+        self.timeout = timeout
 
         self.prepared_requests.append(request)
 
