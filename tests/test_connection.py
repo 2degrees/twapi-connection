@@ -102,7 +102,7 @@ class TestConnection(object):
         else:
             assert_false(prepared_request.body)
 
-    def test_absolute_url(self):
+    def test_absolute_api_url(self):
         connection = _MockConnection()
 
         api_absolute_url = Connection._API_URL + _STUB_URL_PATH
@@ -110,6 +110,15 @@ class TestConnection(object):
 
         prepared_request = connection.prepared_requests[0]
         eq_(api_absolute_url, prepared_request.url)
+
+    def test_custom_base_api_url(self):
+        api_url = 'http://example.com'
+        connection = _MockConnection(api_url=api_url)
+
+        connection.send_get_request(_STUB_URL_PATH)
+
+        prepared_request = connection.prepared_requests[0]
+        eq_(api_url + _STUB_URL_PATH, prepared_request.url)
 
     def test_user_agent(self):
         connection = _MockConnection()
@@ -278,7 +287,7 @@ class _MockConnection(Connection):
         super_class.__init__(email_address, password, *args, **kwargs)
 
         self.adapter = _MockRequestsAdapter(response_data_maker)
-        self._session.mount(self._API_URL, self.adapter)
+        self._session.mount(self._api_url, self.adapter)
 
     @property
     def prepared_requests(self):

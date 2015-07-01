@@ -45,8 +45,10 @@ class Connection(object):
 
     _API_URL = 'https://www.2degreesnetwork.com/api'
 
-    def __init__(self, email_address, password):
+    def __init__(self, email_address, password, api_url=None):
         super(Connection, self).__init__()
+
+        self._api_url = api_url or self._API_URL
 
         self._authentication_handler = HTTPBasicAuth(email_address, password)
 
@@ -130,10 +132,10 @@ class Connection(object):
         query_string_args=None,
         body_deserialization=None,
         ):
-        if url.startswith(self._API_URL):
+        if url.startswith(self._api_url):
             url = url
         else:
-            url = self._API_URL + url
+            url = self._api_url + url
 
         query_string_args = query_string_args or {}
 
