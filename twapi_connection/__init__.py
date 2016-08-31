@@ -15,6 +15,7 @@
 ##############################################################################
 
 from http.client import FORBIDDEN as HTTP_STATUS_FORBIDDEN
+from http.client import NO_CONTENT as HTTP_STATUS_NO_CONTENT
 from http.client import NOT_FOUND as HTTP_STATUS_NOT_FOUND
 from http.client import OK as HTTP_STATUS_OK
 from http.client import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
@@ -181,7 +182,7 @@ class Connection:
 
     @classmethod
     def _require_deserializable_response_body(cls, response):
-        if response.status_code == HTTP_STATUS_OK:
+        if response.status_code in (HTTP_STATUS_OK, HTTP_STATUS_NO_CONTENT):
             if response.content:
                 cls._require_json_response(response)
         else:
