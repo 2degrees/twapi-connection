@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2015, 2degrees Limited.
+# Copyright (c) 2015-2016, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twapi-connection
@@ -25,25 +25,23 @@ from nose.tools import eq_
 from tests.utils import assert_raises_substring
 from tests.utils import get_uuid4_str
 from twapi_connection.exc import AuthenticationError
-from twapi_connection.testing import MockConnection
-from twapi_connection.testing import SuccessfulAPICall
-from twapi_connection.testing import UnsuccessfulAPICall
-
+from twapi_connection.testing import MockConnection, MockResponse, \
+    SuccessfulAPICall, UnsuccessfulAPICall
 
 _STUB_URL_PATH = '/foo'
 
-_STUB_RESPONSE_BODY_DESERIALIZATION = {'foo': 'bar'}
+_STUB_RESPONSE = MockResponse({'foo': 'bar'})
 
 _STUB_API_CALL_1 = SuccessfulAPICall(
     _STUB_URL_PATH,
     'GET',
-    response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+    response=_STUB_RESPONSE,
     )
 
 _STUB_API_CALL_2 = SuccessfulAPICall(
     _STUB_URL_PATH,
     'POST',
-    response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+    response=_STUB_RESPONSE,
     )
 
 
@@ -53,11 +51,10 @@ class TestMockConnection(object):
         connection = \
             self._make_connection_for_expected_api_call(_STUB_API_CALL_1)
 
-        response_body_deserialization = \
-            connection.send_get_request(_STUB_URL_PATH)
+        response = connection.send_get_request(_STUB_URL_PATH)
 
         self._assert_sole_api_call_equals(_STUB_API_CALL_1, connection)
-        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+        eq_(_STUB_RESPONSE, response)
 
     def test_get_request_with_query_string_args(self):
         query_string_args = {'foo': 'bar'}
@@ -65,7 +62,7 @@ class TestMockConnection(object):
             _STUB_URL_PATH,
             'GET',
             query_string_args,
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
@@ -78,16 +75,15 @@ class TestMockConnection(object):
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
             'HEAD',
-            response_body_deserialization=None,
+            response=MockResponse(None),
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
 
-        response_body_deserialization = \
-            connection.send_head_request(_STUB_URL_PATH)
+        response = connection.send_head_request(_STUB_URL_PATH)
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        assert_is_none(response_body_deserialization)
+        assert_is_none(response.json())
 
     def test_head_request_with_query_string_args(self):
         query_string_args = {'foo': 'bar'}
@@ -95,7 +91,7 @@ class TestMockConnection(object):
             _STUB_URL_PATH,
             'HEAD',
             query_string_args,
-            response_body_deserialization=None,
+            response=None,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
@@ -108,16 +104,15 @@ class TestMockConnection(object):
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
             'POST',
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
 
-        response_body_deserialization = \
-            connection.send_post_request(_STUB_URL_PATH)
+        response = connection.send_post_request(_STUB_URL_PATH)
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+        eq_(_STUB_RESPONSE, response)
 
     def test_post_request_with_body(self):
         request_body_deserialization = {'foo': 'bar'}
@@ -125,18 +120,18 @@ class TestMockConnection(object):
             _STUB_URL_PATH,
             'POST',
             request_body_deserialization=request_body_deserialization,
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
 
-        response_body_deserialization = connection.send_post_request(
+        response = connection.send_post_request(
             _STUB_URL_PATH,
             request_body_deserialization,
             )
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+        eq_(_STUB_RESPONSE, response)
 
     def test_put_request(self):
         request_body_deserialization = {'foo': 'bar'}
@@ -144,49 +139,45 @@ class TestMockConnection(object):
             _STUB_URL_PATH,
             'PUT',
             request_body_deserialization=request_body_deserialization,
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
 
-        response_body_deserialization = connection.send_put_request(
+        response = connection.send_put_request(
             _STUB_URL_PATH,
             request_body_deserialization,
             )
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+        eq_(_STUB_RESPONSE, response)
 
     def test_delete_request(self):
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
             'DELETE',
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
 
-        response_body_deserialization = \
-            connection.send_delete_request(_STUB_URL_PATH)
+        response = connection.send_delete_request(_STUB_URL_PATH)
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+        eq_(_STUB_RESPONSE, response)
 
     def test_response_data_strings(self):
         connection = \
             self._make_connection_for_expected_api_call(_STUB_API_CALL_1)
 
-        response_body_deserialization = \
-            connection.send_get_request(_STUB_URL_PATH)
+        response = connection.send_get_request(_STUB_URL_PATH)
 
         # Inspect returned data
-        _assert_dict_keys_and_values_are_strings(response_body_deserialization)
+        _assert_dict_keys_and_values_are_strings(response.json())
 
         # Inspect stored data
         api_call = connection.api_calls[0]
-        _assert_dict_keys_and_values_are_strings(
-            api_call.response_body_deserialization,
-            )
+        _assert_dict_keys_and_values_are_strings(api_call.response.json())
 
     def test_multiple_api_calls_simulators(self):
         connection = MockConnection(
@@ -299,7 +290,7 @@ class TestMockConnection(object):
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
             'PUT',
-            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            response=_STUB_RESPONSE,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)

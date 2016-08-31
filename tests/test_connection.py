@@ -150,7 +150,8 @@ class TestConnection(object):
             )
         connection = _MockConnection(response_data_maker)
 
-        response_data = connection.send_get_request(_STUB_URL_PATH)
+        response = connection.send_get_request(_STUB_URL_PATH)
+        response_data = response.json()
 
         eq_(expected_body_deserialization, response_data)
 

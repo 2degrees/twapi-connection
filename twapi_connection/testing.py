@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2015, 2degrees Limited.
+# Copyright (c) 2015-2016, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twapi-connection
@@ -28,10 +28,7 @@ APICall = Record.create_type(
     )
 
 
-SuccessfulAPICall = APICall.extend_type(
-    'SuccessfulAPICall',
-    'response_body_deserialization',
-    )
+SuccessfulAPICall = APICall.extend_type('SuccessfulAPICall', 'response')
 
 
 UnsuccessfulAPICall = APICall.extend_type('UnsuccessfulAPICall', 'exception')
@@ -110,7 +107,7 @@ class MockConnection(object):
         if isinstance(expected_api_call, UnsuccessfulAPICall):
             raise expected_api_call.exception
 
-        return expected_api_call.response_body_deserialization
+        return expected_api_call.response
 
     @property
     def api_calls(self):
@@ -123,6 +120,16 @@ class MockConnection(object):
         error_message = 'Not enough API calls for new requests ' \
             '(requested {!r})'.format(url)
         assert are_enough_api_calls, error_message
+
+
+class MockResponse:
+
+    def __init__(self, body_deserialization, headers=None):
+        self._body_deserialization = body_deserialization
+        self.headers = headers or {}
+
+    def json(self):
+        return self._body_deserialization
 
 
 def _assert_request_matches_api_call(

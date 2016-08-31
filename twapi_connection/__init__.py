@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2015, 2degrees Limited.
+# Copyright (c) 2015-2016, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twapi-connection
@@ -41,7 +41,7 @@ _USER_AGENT = '2degrees Python Client/' + _DISTRIBUTION_VERSION
 _HTTP_CONNECTION_MAX_RETRIES = 3
 
 
-class Connection(object):
+class Connection:
 
     _API_URL = 'https://www.2degreesnetwork.com/api'
 
@@ -159,26 +159,10 @@ class Connection(object):
             timeout=self._timeout,
             )
 
-        response_body_deserialization = \
-            self._deserialize_response_body(response)
-        return response_body_deserialization
+        self._require_successful_response(response)
+        self._require_deserializable_response_body(response)
 
-    @classmethod
-    def _deserialize_response_body(cls, response):
-        cls._require_successful_response(response)
-
-        if response.status_code == HTTP_STATUS_OK:
-            if response.content:
-                cls._require_json_response(response)
-                response_body_deserialization = response.json()
-            else:
-                response_body_deserialization = None
-        else:
-            exception_message = \
-                'Unsupported response status {}'.format(response.status_code)
-            raise UnsupportedResponseError(exception_message)
-
-        return response_body_deserialization
+        return response
 
     @staticmethod
     def _require_successful_response(response):
@@ -194,6 +178,16 @@ class Connection(object):
             raise exception_class()
         elif 500 <= response.status_code < 600:
             raise ServerError(response.reason, response.status_code)
+
+    @classmethod
+    def _require_deserializable_response_body(cls, response):
+        if response.status_code == HTTP_STATUS_OK:
+            if response.content:
+                cls._require_json_response(response)
+        else:
+            exception_message = \
+                'Unsupported response status {}'.format(response.status_code)
+            raise UnsupportedResponseError(exception_message)
 
     @staticmethod
     def _require_json_response(response):
