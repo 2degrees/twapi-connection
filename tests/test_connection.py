@@ -204,6 +204,14 @@ class TestConnection(object):
 
         eq_(None, response_data)
 
+    def test_response_with_no_content(self):
+        response_data_maker = _ResponseMaker(204, None, 'application/json')
+        connection = _MockConnection(response_data_maker)
+
+        response = connection.send_get_request(_STUB_URL_PATH)
+
+        eq_('', response.content)
+
     def test_context_manager(self):
         with _MockConnection() as connection:
             assert_is_instance(connection, _MockConnection)
