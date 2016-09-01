@@ -200,9 +200,9 @@ class TestConnection(object):
         response_data_maker = _ResponseMaker(200, None, 'application/json')
         connection = _MockConnection(response_data_maker)
 
-        response_data = connection.send_head_request(_STUB_URL_PATH)
+        response = connection.send_head_request(_STUB_URL_PATH)
 
-        eq_(None, response_data)
+        eq_('', response.content)
 
     def test_response_with_no_content(self):
         response_data_maker = _ResponseMaker(204, None, 'application/json')

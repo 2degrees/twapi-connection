@@ -82,7 +82,7 @@ class Connection:
         :param dict query_string_args: The query string arguments
 
         """
-        self._send_request('HEAD', url, query_string_args)
+        return self._send_request('HEAD', url, query_string_args)
 
     def send_post_request(self, url, body_deserialization=None):
         """

@@ -72,10 +72,11 @@ class TestMockConnection(object):
         self._assert_sole_api_call_equals(expected_api_call, connection)
 
     def test_head_request(self):
+        expected_response = MockResponse(None)
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
             'HEAD',
-            response=MockResponse(None),
+            response=expected_response,
             )
         connection = \
             self._make_connection_for_expected_api_call(expected_api_call)
@@ -83,7 +84,7 @@ class TestMockConnection(object):
         response = connection.send_head_request(_STUB_URL_PATH)
 
         self._assert_sole_api_call_equals(expected_api_call, connection)
-        assert_is_none(response.json())
+        eq_(expected_response, response)
 
     def test_head_request_with_query_string_args(self):
         query_string_args = {'foo': 'bar'}
