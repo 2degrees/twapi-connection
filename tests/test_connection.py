@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2015, 2degrees Limited.
+# Copyright (c) 2015-2016, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twapi-connection
@@ -36,9 +36,7 @@ from twapi_connection.exc import NotFoundError
 from twapi_connection.exc import ServerError
 from twapi_connection.exc import UnsupportedResponseError
 
-
 _STUB_URL_PATH = '/foo'
-
 
 _STUB_EMAIL_ADDRESS = 'foo@bar.com'
 
@@ -46,7 +44,6 @@ _STUB_PASSWORD = get_uuid4_str()
 
 
 class TestConnection(object):
-
     def test_get_request(self):
         self._check_request_sender('GET', 'send_get_request', False)
 
@@ -147,7 +144,7 @@ class TestConnection(object):
             200,
             expected_body_deserialization,
             'application/json',
-            )
+        )
         connection = _MockConnection(response_data_maker)
 
         response = connection.send_get_request(_STUB_URL_PATH)
@@ -225,7 +222,6 @@ class TestConnection(object):
 
 
 class TestErrorResponses(object):
-
     def test_server_error_response(self):
         response_data_maker = _ResponseMaker(500)
         connection = _MockConnection(response_data_maker)
@@ -260,10 +256,9 @@ class TestErrorResponses(object):
 
 
 class TestAuthentication(object):
-
     def test_valid_credentials(self):
         connection = _MockConnection()
-        response_data = connection.send_get_request(_STUB_URL_PATH)
+        connection.send_get_request(_STUB_URL_PATH)
         prepared_request = connection.prepared_requests[0]
         authentication_header_value = prepared_request.headers['authorization']
         expected_header_value = \
@@ -273,10 +268,9 @@ class TestAuthentication(object):
     def test_invalid_credentials(self):
         incorrect_password = get_uuid4_str()
         connection = _MockConnection(
-            email_address=_STUB_EMAIL_ADDRESS,
-            password=incorrect_password,
+            auth=(_STUB_EMAIL_ADDRESS, incorrect_password),
             response_data_maker=_ResponseMaker(401, {}),
-            )
+        )
         with assert_raises(AuthenticationError):
             connection.send_get_request(_STUB_URL_PATH)
 
@@ -287,18 +281,22 @@ class TestAuthentication(object):
         eq_(expected_header_value, authentication_header_value)
 
 
-class _MockConnection(Connection):
+class _MockRequest:
 
+    def __init__(self):
+        self.headers = {}
+
+
+class _MockConnection(Connection):
     def __init__(
         self,
         response_data_maker=None,
-        email_address=_STUB_EMAIL_ADDRESS,
-        password=_STUB_PASSWORD,
+        auth=(_STUB_EMAIL_ADDRESS, _STUB_PASSWORD),
         *args,
         **kwargs
-        ):
+    ):
         super_class = super(_MockConnection, self)
-        super_class.__init__(email_address, password, *args, **kwargs)
+        super_class.__init__(auth, *args, **kwargs)
 
         self.adapter = _MockRequestsAdapter(response_data_maker)
         self._session.mount(self._api_url, self.adapter)
@@ -309,7 +307,6 @@ class _MockConnection(Connection):
 
 
 class _MockRequestsAdapter(RequestsHTTPAdapter):
-
     def __init__(self, response_data_maker=None, *args, **kwargs):
         super(_MockRequestsAdapter, self).__init__(*args, **kwargs)
 
@@ -339,7 +336,6 @@ class _MockRequestsAdapter(RequestsHTTPAdapter):
 
 
 class _ResponseMaker(object):
-
     def __init__(self, status_code, body_deserialization='', content_type=None):
         super(_ResponseMaker, self).__init__()
 

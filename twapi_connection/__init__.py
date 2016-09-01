@@ -19,7 +19,6 @@ from json import dumps as json_serialize
 
 from pkg_resources import get_distribution
 from requests.adapters import HTTPAdapter
-from requests.auth import HTTPBasicAuth
 from requests.sessions import Session
 
 from twapi_connection.exc import AccessDeniedError
@@ -41,12 +40,12 @@ class Connection:
 
     _API_URL = 'https://www.2degreesnetwork.com/api'
 
-    def __init__(self, email_address, password, timeout=None, api_url=None):
+    def __init__(self, auth, timeout=None, api_url=None):
         super(Connection, self).__init__()
 
         self._api_url = api_url or self._API_URL
 
-        self._authentication_handler = HTTPBasicAuth(email_address, password)
+        self._authentication_handler = auth
 
         self._session = Session()
         self._session.headers['User-Agent'] = _USER_AGENT
