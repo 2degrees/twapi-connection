@@ -281,7 +281,7 @@ class TestAuthentication(object):
         eq_(expected_header_value, authentication_header_value)
 
 
-class _MockRequest:
+class MockRequest:
 
     def __init__(self):
         self.headers = {}

@@ -16,12 +16,12 @@
 
 from nose.tools import assert_in, eq_
 
-from auth import BearerTokenAuth
-from test_connection import _MockRequest
+from tests.test_connection import MockRequest
+from twapi_connection.auth import BearerTokenAuth
 
 
 def test_bearer_token_auth():
-    request = _MockRequest()
+    request = MockRequest()
     token = 'my token'
     authentication_handler = BearerTokenAuth(token)
     request_with_authentication = authentication_handler(request)
