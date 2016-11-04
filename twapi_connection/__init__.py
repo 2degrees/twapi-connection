@@ -13,8 +13,11 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+try:
+    from http import HTTPStatus
+except ImportError:
+    from http import client as HTTPStatus
 
-from http import HTTPStatus
 from json import dumps as json_serialize
 
 from pkg_resources import get_distribution
